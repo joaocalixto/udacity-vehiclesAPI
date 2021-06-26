@@ -4,9 +4,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -140,6 +138,37 @@ public class CarControllerTest {
         result.andExpect(jsonPath("$.details.model", is(car.getDetails().getModel())));
         result.andExpect(jsonPath("$.details.body", is(car.getDetails().getBody())));
         result.andExpect(jsonPath("$.details.numberOfDoors", is(car.getDetails().getNumberOfDoors())));
+    }
+
+    @Test
+    public void updateCar() throws Exception {
+
+        Car car = getCar();
+
+        final ResultActions result = mvc.perform(
+                put(new URI("/cars/1"))
+                        .content(json.write(car).getJson())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk());
+
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.length()", greaterThan(1)));
+        result.andExpect(jsonPath("$.id", is(1)));
+        result.andExpect(jsonPath("$.details.model", is(car.getDetails().getModel())));
+        result.andExpect(jsonPath("$.details.body", is(car.getDetails().getBody())));
+        result.andExpect(jsonPath("$.details.numberOfDoors", is(car.getDetails().getNumberOfDoors())));
+    }
+
+    @Test
+    public void updateCarBadRequest() throws Exception {
+
+        mvc.perform(
+                put(new URI("/cars/1"))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isBadRequest());
+
     }
 
     /**
